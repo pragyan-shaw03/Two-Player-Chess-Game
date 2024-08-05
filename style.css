@@ -1,0 +1,30 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.container {
+    height: 480px;
+    width: 480px;
+    display: flex;
+    flex-wrap: wrap;
+    box-shadow: 2px 2px 20px black;
+    margin: auto;
+    margin-top: 100px;
+}
+.box {
+    height: 60px;
+    width: 60px;
+    font-size: 40px;
+    text-align: center;
+    padding: 5px;
+}
+.white {
+    color: rgb(255, 236, 236);
+}
+.brown {
+    color: rgb(130, 35, 35);
+}
+i {
+    text-shadow: 1px 1px 2px black;
+}
