@@ -18,6 +18,11 @@
     font-size: 40px;
     text-align: center;
     padding: 5px;
+    position: relative;
+}
+#piece {
+    position: relative;
+    z-index: 10;
 }
 .white {
     color: rgb(255, 236, 236);
@@ -27,4 +32,6 @@
 }
 i {
     text-shadow: 1px 1px 2px black;
+    position: relative;
+    z-index: -9;
 }

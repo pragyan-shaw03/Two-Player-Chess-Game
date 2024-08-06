@@ -4,7 +4,7 @@ let KNIGHT = '<i class="fa-solid fa-chess-knight"></i>';
 let BISHOP = '<i class="fa-solid fa-chess-bishop"></i>';
 let KING = '<i class="fa-solid fa-chess-king"></i>';
 let QUEEN = '<i class="fa-solid fa-chess-queen"></i>';
-
+let playerGo = 'white';
 let displayBoard = [[ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK],
              [PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN],
              ['', '', '', '', '', '', '', ''],
@@ -21,18 +21,20 @@ function initialise() {
         color = !color;
         for (let j = 0; j < 8; j++) {
             const box = document.createElement('div');
+            const piece = document.createElement('div');
+            piece.id = 'piece';
+            piece.setAttribute('draggable', true);
+            piece.innerHTML = displayBoard[i][j];
+
+            box.appendChild(piece);
+            
             box.className = 'box';
             box.setAttribute('row', i);
             box.setAttribute('col', j);
-            box.innerHTML = displayBoard[i][j];
             board.appendChild(box);
-            
-            let icon = box.querySelector('i');
-            if (icon) icon.setAttribute('id', 'i');
-            if (icon) icon.setAttribute('draggable', true);
 
-            if (i < 2 && icon) icon.classList.add('brown');
-            else if (icon && i > 5) icon.classList.add('white'); 
+            if (i < 2) piece.classList.add('brown');
+            else if (i > 5) piece.classList.add('white'); 
             
             if (color) box.style.backgroundColor = '#3636e1';
             else box.style.backgroundColor = '#c0bbbb';
@@ -44,6 +46,9 @@ initialise();
 
 let boxes = document.querySelectorAll('.box');
 let startRow, startCol, targetRow, targetCol;
+let draggedElement;
+
+
 boxes.forEach((box) => {
     box.addEventListener('dragstart', dragStart);
     box.addEventListener('dragover', dragOver);
@@ -52,21 +57,67 @@ boxes.forEach((box) => {
 function dragStart(e) {
     startRow = e.target.parentElement.getAttribute('row');
     startCol = e.target.parentElement.getAttribute('col');
+    draggedElement = e.target;
     console.log(startRow, startCol);
 }
 function dragOver(e) {
     e.preventDefault();
 }
 function dragDrop(e) {
-    console.log(e);
-    if (e.target.id === 'i') { // if icon is the target element
-        let parent = e.target.parentElement; //accessing parent and removing icon
-        parent.removeChild(e.target);
-        parent.appendChild(document.querySelector(`[row='${startRow}'][col='${startCol}']`).firstChild);
+    console.log(e.target);
+    const taken = e.target.id === 'piece';
+    if (taken) {
+        targetRow = e.target.parentElement.getAttribute('row');
+        targetCol = e.target.parentElement.getAttribute('col');
+    } else {
+        targetRow = e.target.getAttribute('row');
+        targetCol = e.target.getAttribute('col');
     }
-    else { // if box is target
-        if (e.target.firstChild) e.target.removeChild(e.target.firstChild); //removing icon if box contains
-        e.target.appendChild(document.querySelector(`[row='${startRow}'][col='${startCol}']`).firstChild);
+    console.log(targetRow, targetCol);
+    const correctGo = draggedElement.classList.contains(playerGo);
+    const selfCapture = taken && e.target.classList.contains(playerGo);
+    const valid = checkAllValid();
+
+    if (!correctGo || selfCapture || !checkAllValid()) {
+        alert('Wrong Move');
+        return;
     }
+    if (taken) {
+        e.target.parentElement.append(draggedElement);
+        e.target.remove();
+    }else {
+        e.target.appendChild(draggedElement);
+    }
+    changePlayer();
+    reverseId();
 }
 
+function reverseId() {
+    boxes.forEach((box) => {
+        let r = box.getAttribute('row');
+        let c = box.getAttribute('col');
+        box.setAttribute('row', 7-r);
+        box.setAttribute('col', 7-c);
+    })
+}
+
+function changePlayer() {
+    playerGo = playerGo === 'white'? 'brown' : "white";
+}
+
+function checkAllValid() {
+    let piece = draggedElement.innerHTML;
+    switch(piece) {
+        case PAWN:
+            if (targetCol != startCol) return false;
+            if (targetRow == startRow) return false;
+            if (startRow == 6) {
+                if (startRow - targetRow <= 2 ) return true;
+            } else {
+                if (startRow - targetRow == 1) return true;
+            }
+            break;
+        default:
+            return false;
+    }
+}
