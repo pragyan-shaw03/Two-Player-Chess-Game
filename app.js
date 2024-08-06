@@ -26,7 +26,7 @@ function initialise() {
             piece.setAttribute('draggable', true);
             piece.innerHTML = displayBoard[i][j];
 
-            box.appendChild(piece);
+            if (displayBoard[i][j] != '') box.appendChild(piece);
             
             box.className = 'box';
             box.setAttribute('row', i);
@@ -65,7 +65,7 @@ function dragOver(e) {
 }
 function dragDrop(e) {
     console.log(e.target);
-    const taken = e.target.id === 'piece';
+    const taken = e.target.id == 'piece';
     if (taken) {
         targetRow = e.target.parentElement.getAttribute('row');
         targetCol = e.target.parentElement.getAttribute('col');
@@ -76,7 +76,6 @@ function dragDrop(e) {
     console.log(targetRow, targetCol);
     const correctGo = draggedElement.classList.contains(playerGo);
     const selfCapture = taken && e.target.classList.contains(playerGo);
-    const valid = checkAllValid();
 
     if (!correctGo || selfCapture || !checkAllValid()) {
         alert('Wrong Move');
@@ -107,16 +106,90 @@ function changePlayer() {
 
 function checkAllValid() {
     let piece = draggedElement.innerHTML;
+    let targetElement = document.querySelector(`[row='${targetRow}'][col ='${targetCol}']`).firstChild;
     switch(piece) {
         case PAWN:
-            if (targetCol != startCol) return false;
             if (targetRow == startRow) return false;
+            
+            if (targetCol != startCol) {
+                if (Math.abs(targetCol-startCol) == 1 && targetElement && !targetElement.classList.contains(playerGo))
+                    return true;
+                return false;
+            }
+            
             if (startRow == 6) {
-                if (startRow - targetRow <= 2 ) return true;
+                if (startRow - targetRow > 2) return false;
+                for (let i = startRow-1; i >= targetRow; i--) {
+                    if (document.querySelector(`[row='${i}'][col ='${startCol}']`).firstChild) return false;
+                }
+                return true;
             } else {
-                if (startRow - targetRow == 1) return true;
+                if  (startRow - targetRow != 1) return false;
+                if (document.querySelector(`[row='${targetRow}'][col ='${startCol}']`).firstChild) return false;
+                return true;
             }
             break;
+        
+        case ROOK:
+            if (startCol != targetCol && startRow != targetRow) return false;
+            if (startCol == targetCol) {
+                let start = startRow < targetRow ? startRow : targetRow;
+                let end = startRow > targetRow ? startRow : targetRow;
+                console.log(start, end);
+                for (let i = Number(start)+1; i < end; i++) {
+                    console.log(i);
+                    if ((document.querySelector(`[row='${i}'][col ='${startCol}']`)).firstChild != null) return false;
+                }
+                return true;
+            }
+            if (startRow == targetRow) {
+                let start = startCol < targetCol ? startCol : targetCol;
+                let end = startCol > targetCol ? startCol : targetCol;
+                console.log(start, end);
+                for (let i = Number(start)+1; i < end; i++) {
+                    console.log(i);
+                    if ((document.querySelector(`[row='${startRow}'][col ='${i}']`)).firstChild != null) return false;
+                }
+                return true;
+            }
+            return false;
+            break;
+        
+        case KING:
+            let r = [0, 1, -1];
+            let c = [0, 1, -1];
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    let rr = Number(startRow) + r[i];
+                    let cc = Number(startCol) + c[j];
+                    console.log(rr, cc);
+                    if (targetRow == rr && targetCol == cc) return true;
+                }
+            }
+            return false;
+            break;
+        
+        case KNIGHT:
+            let pos = [[startRow-2, startCol], [Number(startRow)+2, startCol], [startRow, startCol-2], [startRow, Number(startCol)+2]];
+            for (let i = 0; i < 2; i++) {
+                let rr = pos[i][0];
+                let cc = Number(pos[i][1]) + 1;
+                if (targetCol == cc && targetRow == rr) return true;
+                rr = pos[i][0];
+                cc = pos[i][1] - 1;
+                if (targetCol == cc && targetRow == rr) return true;
+            }
+            for (let i = 2; i < 4; i++) {
+                let rr = Number(pos[i][0])+1;
+                let cc = pos[i][1];
+                if (targetCol == cc && targetRow == rr) return true;
+                rr = Number(pos[i][0])-1;
+                cc = pos[i][1];
+                if (targetCol == cc && targetRow == rr) return true;
+            }
+            return false;
+            break;
+
         default:
             return false;
     }
