@@ -11,6 +11,7 @@
     box-shadow: 2px 2px 20px black;
     margin: auto;
     margin-top: 100px;
+    transition: transform 0.5s ease;
 }
 .box {
     height: 60px;
@@ -33,6 +34,10 @@
 i {
     text-shadow: 1px 1px 2px black;
     margin-top: 10px;
+    transition: transform 0.5s ease;
     position: relative;
     z-index: -9;
+}
+.rotate {
+    transform: rotate(180deg) !important;
 }

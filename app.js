@@ -102,6 +102,14 @@ function reverseId() {
 
 function changePlayer() {
     playerGo = playerGo === 'white' ? 'brown' : "white";
+    if (playerGo === 'brown') {
+        document.querySelector('.container').classList.add('rotate');
+        document.querySelectorAll('#piece').forEach((icon) => icon.classList.add('rotate'));
+    }
+    else {
+        document.querySelector('.container').classList.remove('rotate');
+        document.querySelectorAll('#piece').forEach((icon) => icon.classList.remove('rotate'));
+    }
 }
 
 function checkAllValid() {
