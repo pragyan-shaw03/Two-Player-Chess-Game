@@ -110,7 +110,7 @@ function checkAllValid() {
     switch(piece) {
         case PAWN:
             if (targetRow == startRow) return false;
-            
+            if (targetRow > startRow) return false;
             if (targetCol != startCol) {
                 if (Math.abs(targetCol-startCol) == 1 && targetElement && !targetElement.classList.contains(playerGo))
                     return true;
