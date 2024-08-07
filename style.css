@@ -11,7 +11,7 @@
     box-shadow: 2px 2px 20px black;
     margin: auto;
     margin-top: 100px;
-    transition: transform 0.5s ease;
+    transition: transform 1s ease;
 }
 .box {
     height: 60px;

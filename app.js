@@ -47,7 +47,8 @@ initialise();
 let boxes = document.querySelectorAll('.box');
 let startRow, startCol, targetRow, targetCol;
 let draggedElement;
-
+let whiteKingMoved = false, whiteRook1Moved = false, whiteRook2Moved = false;
+let blackKingMoved = false, blackRook1Moved = false, blackRook2Moved = false;
 
 boxes.forEach((box) => {
     box.addEventListener('dragstart', dragStart);
@@ -81,6 +82,17 @@ function dragDrop(e) {
         alert('Wrong Move');
         return;
     }
+    console.log(draggedElement.innerHTML);
+    if (draggedElement.innerHTML == KING) {
+        if (playerGo == 'white') whiteKingMoved = true;
+        else blackKingMoved = false;
+    } else if (draggedElement.innerHTML == ROOK && startCol == 7) {
+        if (playerGo == 'white') whiteRook1Moved = true;
+        else blackRook2Moved = true;
+    } else if (draggedElement.innerHTML == ROOK && startCol == 0) {
+        if (playerGo == 'white') whiteRook2Moved = true;
+        else blackRook1Moved = true;
+    }
     if (taken) {
         e.target.parentElement.append(draggedElement);
         e.target.remove();
@@ -103,12 +115,16 @@ function reverseId() {
 function changePlayer() {
     playerGo = playerGo === 'white' ? 'brown' : "white";
     if (playerGo === 'brown') {
-        document.querySelector('.container').classList.add('rotate');
-        document.querySelectorAll('#piece').forEach((icon) => icon.classList.add('rotate'));
+        setTimeout(() => {
+            document.querySelector('.container').classList.add('rotate');
+            document.querySelectorAll('#piece').forEach((icon) => icon.classList.add('rotate'));
+        }, 500);
     }
     else {
-        document.querySelector('.container').classList.remove('rotate');
-        document.querySelectorAll('#piece').forEach((icon) => icon.classList.remove('rotate'));
+        setTimeout(() => {
+            document.querySelector('.container').classList.remove('rotate');
+            document.querySelectorAll('#piece').forEach((icon) => icon.classList.remove('rotate'));
+        }, 500);
     }
 }
 
@@ -164,6 +180,35 @@ function checkAllValid() {
             break;
 
         case KING:
+            if (playerGo == 'white' && !whiteKingMoved && !whiteRook1Moved && targetRow == 7 && targetCol == 6) {
+                if ((document.querySelector(`[row='${7}'][col ='${6}']`)).firstChild == null && (document.querySelector(`[row='${7}'][col ='${5}']`)).firstChild == null) {
+                    let rook = document.querySelector(`[row='${7}'][col ='${7}']`);
+                    document.querySelector(`[row='${7}'][col ='${5}']`).appendChild(rook.firstChild); // adding child to other node can remove item from where they are dragged?    
+                    return true;
+                }
+            }
+            if (playerGo == 'white' && !whiteKingMoved && !whiteRook2Moved && targetRow == 7 && targetCol == 2) {
+                if ((document.querySelector(`[row='${7}'][col ='${1}']`)).firstChild == null && (document.querySelector(`[row='${7}'][col ='${2}']`)).firstChild == null && (document.querySelector(`[row='${7}'][col ='${3}']`)).firstChild == null) {
+                    let rook = document.querySelector(`[row='${7}'][col ='${0}']`);
+                    document.querySelector(`[row='${7}'][col ='${3}']`).appendChild(rook.firstChild); // adding child to other node can remove item from where they are dragged?    
+                    return true;
+                }
+            }
+            if (playerGo == 'brown' && !blackKingMoved && !blackRook1Moved && targetRow == 7 && targetCol == 1) {
+                if ((document.querySelector(`[row='${7}'][col ='${1}']`)).firstChild == null && (document.querySelector(`[row='${7}'][col ='${2}']`)).firstChild == null) {
+                    let rook = document.querySelector(`[row='${7}'][col ='${0}']`);
+                    document.querySelector(`[row='${7}'][col ='${2}']`).appendChild(rook.firstChild); // adding child to other node can remove item from where they are dragged?    
+                    return true;
+                }
+            }
+            if (playerGo == 'brown' && !blackKingMoved && !blackRook2Moved && targetRow == 7 && targetCol == 5) {
+                if ((document.querySelector(`[row='${7}'][col ='${4}']`)).firstChild == null && (document.querySelector(`[row='${7}'][col ='${5}']`)).firstChild == null && (document.querySelector(`[row='${7}'][col ='${6}']`)).firstChild == null) {
+                    let rook = document.querySelector(`[row='${7}'][col ='${7}']`);
+                    document.querySelector(`[row='${7}'][col ='${4}']`).appendChild(rook.firstChild); // adding child to other node can remove item from where they are dragged?    
+                    return true;
+                }
+            }
+
             let r = [0, 1, -1];
             let c = [0, 1, -1];
             for (let i = 0; i < 3; i++) {
@@ -273,7 +318,7 @@ function checkAllValid() {
                 }
                 return false;
             }
-        break;
+            break;
         default:
             return false;
     }
